@@ -105,9 +105,9 @@ impl Interpreter {
                     jump_forward_index_stack.push(index);
                 },
                 Token::JumpBackward => {
-                    if self.memory[current_pointer] != 0 {
-                        let jump_forward_index = jump_forward_index_stack.pop();
+                    let jump_forward_index = jump_forward_index_stack.pop();
 
+                    if self.memory[current_pointer] != 0 {
                         match jump_forward_index {
                             Some(jump_forward_index) => {
                                 index = jump_forward_index;

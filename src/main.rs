@@ -114,7 +114,7 @@ impl Interpreter {
                                 jump_forward_index_stack.push(index);
                             },
                             None => {
-                                todo!();
+                                eprintln!("Failed with invalid loop instruction.");
                             }
                         }
                     }
@@ -130,10 +130,30 @@ impl Interpreter {
 
                     io::stdin().read_line(&mut input)
                         .expect("Failed to read from STDIN.");
+
+                    let characters_length = input.len();
+
+                    for (i, character) in input.chars().enumerate() {
+                        if character.is_ascii() {
+                            self.memory[current_pointer] = character as u8;
+
+                            if i != characters_length - 1 {                               
+                                self.pointer += 1;
+
+                                if self.pointer >= self.memory.len() {
+                                    self.memory.push(0);   
+                                }
+                            }
+                        }
+                    }
                 }
             }
 
             index += 1;
+        }
+
+        if jump_forward_index_stack.len() != 0 {
+            eprintln!("Failed with invalid loop instruction.");
         }
     }
 }

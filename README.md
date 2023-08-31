@@ -28,5 +28,4 @@ Replace <source_path> with the path to your Brainfuck source file.
 ## Example
 In this repository, you'll find a sample Brainfuck source file named source.bf. It contains the classic "Hello World" program written in Brainfuck. To execute it, simply run:
 
-    ```sh
     cargo run source.bf

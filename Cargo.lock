@@ -3,5 +3,5 @@
 version = 3
 
 [[package]]
-name = "brainf-compiler"
+name = "brainf-interpreter"
 version = "0.1.0"

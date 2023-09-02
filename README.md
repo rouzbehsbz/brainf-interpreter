@@ -26,6 +26,6 @@ To run the Brainfuck interpreter, follow these steps:
 Replace <source_path> with the path to your Brainfuck source file.
 
 ## Example
-In this repository, you'll find a sample Brainfuck example source files in examples directory. It contains the classic "Hello World" program written in Brainfuck. To execute it, simply run:
+In this repository, you'll find all sample Brainfuck example source files in examples directory. It contains the classic "Hello World" program written in Brainfuck. To execute it, simply run:
 
     cargo run ./examples/hello-world.bf

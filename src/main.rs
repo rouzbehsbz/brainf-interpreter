@@ -26,8 +26,6 @@ fn main() {
     let mut interpreter = Interpreter::default();
     let jump_table = interpreter.create_jump_table(&tokens);
 
-    println!("{:?}", jump_table);
-
     interpreter.run(
         &tokens,
         &jump_table,

@@ -29,7 +29,7 @@ fn main() {
     interpreter.run(
         &tokens,
         &jump_table,
-        io::stdout(),
-        io::stdin()
+        &mut io::stdout(),
+        &mut io::stdin()
     );
 }

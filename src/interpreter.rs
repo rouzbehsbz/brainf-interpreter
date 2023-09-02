@@ -71,8 +71,8 @@ impl Interpreter {
         &mut self,
         tokens: &Tokens,
         jump_table: &JumpTable,
-        mut writer: W,
-        reader: R
+        writer: &mut W,
+        reader: &mut R
     ) 
     where 
         W: Write,
@@ -107,7 +107,14 @@ impl Interpreter {
                     }
                 },
                 Token::Read => {
-                    todo!();
+                    let mut buffer = [0u8; 1];
+
+                    reader
+                        .take(1)
+                        .read_exact(&mut buffer)
+                        .expect("Failed to read from the reader.");
+
+                    *self.current_cell() = Wrapping(buffer[0]);
                 },
                 Token::Write => {
                     let buffer = [self.current_cell().0];

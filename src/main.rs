@@ -24,6 +24,14 @@ fn main() {
 
     let tokens = Token::tokenize(&instructions);
     let mut interpreter = Interpreter::default();
+    let jump_table = interpreter.create_jump_table(&tokens);
 
-    interpreter.run(tokens, io::stdout(), io::stdin());
+    println!("{:?}", jump_table);
+
+    interpreter.run(
+        &tokens,
+        &jump_table,
+        io::stdout(),
+        io::stdin()
+    );
 }

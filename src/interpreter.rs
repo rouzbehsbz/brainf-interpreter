@@ -1,10 +1,11 @@
-use std::{num::Wrapping, borrow::BorrowMut, io::{Write, Read}};
+use std::{num::Wrapping, borrow::BorrowMut, io::{Write, Read}, collections::HashMap};
 
 use crate::token::{Token, Tokens};
 
+type JumpTable = HashMap<usize, usize>;
+
 pub struct Interpreter {
     memory: Vec<Wrapping<u8>>,
-    loop_index_stack: Vec<usize>,
     pointer: usize
 }
 
@@ -12,7 +13,6 @@ impl Default for Interpreter {
     fn default() -> Self {
         Self {
             memory: vec![Wrapping(0); 30_000],
-            loop_index_stack: Vec::new(),
             pointer: 0
         }
     }
@@ -44,7 +44,36 @@ impl Interpreter {
         self.memory[self.pointer].borrow_mut()
     }
 
-    pub fn run<W, R>(&mut self, tokens: Tokens, mut writer: W, reader: R) 
+    pub fn create_jump_table(&mut self, tokens: &Tokens) -> JumpTable {
+        let mut jump_table: JumpTable = HashMap::new();
+        let mut start_loop_index_stack: Vec<usize> = Vec::new();
+
+        for (index, token) in tokens.iter().enumerate() {
+            match token {
+                Token::StartLoop => {
+                    start_loop_index_stack.push(index);
+                },
+                Token::EndLoop => {
+                    let found_start_loop_index = start_loop_index_stack.pop()
+                        .expect("Failed to create jump table.");
+
+                    jump_table.insert(found_start_loop_index, index);
+                    jump_table.insert(index, found_start_loop_index);
+                }
+                _ => continue
+            }
+        }
+
+        jump_table 
+    }
+
+    pub fn run<W, R>(
+        &mut self,
+        tokens: &Tokens,
+        jump_table: &JumpTable,
+        mut writer: W,
+        reader: R
+    ) 
     where 
         W: Write,
         R: Read
@@ -56,10 +85,10 @@ impl Interpreter {
 
             match token {
                 Token::IncreaseValue => {
-                    self.current_cell().0 += 1;
+                    *self.current_cell() += 1;
                 },
                 Token::DecreaseValue => {
-                    self.current_cell().0 -= 1;
+                    *self.current_cell() -= 1;
                 },
                 Token::MovePointerToRight => {
                     self.next_cell();
@@ -68,17 +97,13 @@ impl Interpreter {
                     self.prev_cell();
                 },
                 Token::StartLoop => {
-                    if self.current_cell().0 != 0 {
-                        self.loop_index_stack.push(index);
+                    if self.current_cell().0 == 0 {
+                        index = *jump_table.get(&index).unwrap();
                     }
                 },
                 Token::EndLoop => {
                     if self.current_cell().0 != 0 {
-                        index = *self.loop_index_stack.last()
-                            .expect("Faild to run the program with invalid loop instructions.");
-                    }
-                    else {
-                        self.loop_index_stack.pop();
+                        index = *jump_table.get(&index).unwrap();
                     }
                 },
                 Token::Read => {
